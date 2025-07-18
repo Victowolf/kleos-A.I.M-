@@ -4,12 +4,11 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import routes from "./routes.js"; // Ensure routes.js uses ES module syntax
+import twilioRoutes from "./twilio.js"; // adjust the path if necessary
 
 dotenv.config(); // Load variables from .env
-app.use(express.json()); // <- REQUIRED to parse JSON body
-
-
 const app = express();
+app.use(express.json()); // <- REQUIRED to parse JSON body
 
 // --- Middleware ---
 app.use(cors({
@@ -18,6 +17,8 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
 
 // --- Health check route ---
 app.get("/", (req, res) => {

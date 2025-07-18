@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+export async function sendSMS(to: string, body: string) {
+  return axios.post("/api/send-sms", { to, body });
+}
 
 interface Props {
   onNext: () => void;
@@ -31,10 +36,11 @@ const KYCVerificationPanel: React.FC<Props> = ({ onNext, onPrevious }) => {
     generateCaptcha(); // generate on first load
   }, []);
 
-  const handleGenerateOTP = () => {
+  const handleGenerateOTP = async () => {
     if (captchaInput.trim().toUpperCase() === generatedCaptcha) {
       setOtpSent(true);
       setOtpVerified(false);
+      await sendSMS("+919901669355", "Your OTP is: 123456");
       alert("OTP sent to registered mobile number.");
     } else {
       alert("❌ Invalid CAPTCHA. Please try again.");

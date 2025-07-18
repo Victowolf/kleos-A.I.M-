@@ -1,10 +1,14 @@
 import express from "express";
+import twilioRoutes from "./twilio.js";
 import multer from "multer";
 import KYC, { VerificationMetadata } from "./models.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+router.use(twilioRoutes);
+
 
 // Save user details (initial KYC entry creation)
 router.post("/kyc/details", async (req, res) => {
