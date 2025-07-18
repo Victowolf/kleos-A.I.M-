@@ -129,7 +129,10 @@ const AdminDashboard: React.FC = () => {
                 <option value="90d">Last 90 Days</option>
               </select>
 
-              <button onClick={handleExportReports} className="btn-secondary flex items-center">
+              <button
+                onClick={handleExportReports}
+                className="btn-secondary flex items-center"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export Reports
               </button>

@@ -47,45 +47,55 @@ router.post("/kyc/details", async (req, res) => {
       message: "User details saved successfully and KYC entry created"
     });
   } catch (error) {
-    console.error("Failed to save user details:", error);
-    res.status(500).json({ error: "Failed to save user details" });
+    console.error("Failed to save user details:", error.message, error.stack);
+    res.status(500).json({ error: error.message });
+
+
   }
 });
 
-// Upload multiple documents
+// Document upload
 router.post("/kyc/:kycId/documents", upload.array("docs"), async (req, res) => {
   const { kycId } = req.params;
-  const { docMeta } = req.body;
+  let parsedDocMeta = [];
   const files = req.files;
+
+  if (!files || files.length === 0)
+    return res.status(400).json({ error: "No documents provided for upload." });
+
+  // Parse docMeta (stringified JSON)
+  try {
+    if (req.body.docMeta) {
+      if (Array.isArray(req.body.docMeta)) {
+        parsedDocMeta = req.body.docMeta.map(metaStr => JSON.parse(metaStr));
+      } else {
+        parsedDocMeta = JSON.parse(req.body.docMeta);
+        if (!Array.isArray(parsedDocMeta)) parsedDocMeta = [parsedDocMeta];
+      }
+    }
+  } catch (err) {
+    return res.status(400).json({ error: "Invalid document metadata in upload." });
+  }
+
+  if (parsedDocMeta.length !== files.length)
+    return res.status(400).json({ error: "Metadata count does not match file count." });
 
   try {
     const kyc = await KYC.findOne({ kycId });
-    if (!kyc) return res.status(404).json({ error: "KYC ID not found" });
-
-    let uploadedDocs = [];
-
-    if (files && files.length > 0 && docMeta && Array.isArray(docMeta) && docMeta.length === files.length) {
-      const parsedDocMeta = docMeta.map(metaStr => JSON.parse(metaStr));
-      uploadedDocs = files.map((file, index) => {
-        const metadata = parsedDocMeta.find(m => m.index === index);
-        if (!metadata) {
-          console.warn(`Metadata not found for file at index ${index}`);
-          return null;
-        }
-        return {
-          type: metadata.type,
-          file: file.buffer,
-          contentType: file.mimetype,
-        };
-      }).filter(doc => doc !== null);
-    } else {
-      console.warn("No documents provided for upload or metadata mismatch. Proceeding without documents.");
-    }
-
+    if (!kyc)
+      return res.status(404).json({ error: "KYC ID not found" });
+    const uploadedDocs = files.map((file, index) => {
+      const metadata = parsedDocMeta[index] || {};
+      return {
+        type: metadata.type || "Unknown",
+        file: file.buffer,
+        contentType: file.mimetype,
+        ...(metadata.documentNumber && { documentNumber: metadata.documentNumber })
+      };
+    });
     kyc.documents.push(...uploadedDocs);
     await kyc.save();
-
-    res.json({ message: "Documents processed successfully (some may be missing if not provided)" });
+    res.json({ message: "Documents processed successfully" });
   } catch (error) {
     console.error("Error processing documents:", error);
     res.status(500).json({ error: "Failed to process documents" });
@@ -117,15 +127,14 @@ router.post("/kyc/:kycId/selfie", upload.single("selfie"), async (req, res) => {
   }
 });
 
-// Record consent and finalize KYC
+// Consent & finalize KYC
 router.post("/kyc/:kycId/consent", async (req, res) => {
   const { kycId } = req.params;
   const { consentGiven } = req.body;
-
   try {
     const kyc = await KYC.findOne({ kycId });
-    if (!kyc) return res.status(404).json({ error: "KYC ID not found" });
-
+    if (!kyc)
+      return res.status(404).json({ error: "KYC ID not found" });
     kyc.consentGiven = consentGiven;
     await kyc.save();
     res.json({ message: "Consent recorded successfully and KYC finalized" });
@@ -135,16 +144,16 @@ router.post("/kyc/:kycId/consent", async (req, res) => {
   }
 });
 
-// QR CODE SCAN & VERIFICATION METADATA LOGGING
+
+
+// QR code scan & verification metadata logging
 router.post("/kyc/:kycId/verify", async (req, res) => {
   const { kycId } = req.params;
   try {
     const kyc = await KYC.findOne({ kycId });
-    if (!kyc) return res.status(404).json({ error: "KYC ID not found" });
-
+    if (!kyc)
+      return res.status(404).json({ error: "KYC ID not found" });
     const now = new Date();
-
-    // Store State, KYC Hash, Expiry Date, Name as scan metadata
     await VerificationMetadata.create({
       kycId: kyc.kycId,
       userName: kyc.fullName,
@@ -152,8 +161,6 @@ router.post("/kyc/:kycId/verify", async (req, res) => {
       expiryDate: kyc.kycExpiryDate,
       scannedAt: now
     });
-
-    // Respond with these exact fields in metadata
     res.json({
       kyc_data: {
         state: kyc.state,

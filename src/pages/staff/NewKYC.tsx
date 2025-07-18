@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, User, FileText, Camera, Check, Shield } from 'lucide-react';
-import { AxiosError } from 'axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowLeft, User, FileText, Camera, Check, Shield } from "lucide-react";
+import { AxiosError } from "axios";
 
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
+import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
 
-import UserDetailsPanel from '../../components/kyc/UserDetailsPanel';
-import DocumentUploadPanel from '../../components/kyc/DocumentUploadPanel';
-import FaceVerificationPanel from '../../components/kyc/FaceVerificationPanel';
-import KYCConfirmation from '../../components/kyc/KYCConfirmation';
-import KYCVerificationPanel from '../../components/kyc/KYCVerification';
+import UserDetailsPanel from "../../components/kyc/UserDetailsPanel";
+import DocumentUploadPanel from "../../components/kyc/DocumentUploadPanel";
+import FaceVerificationPanel from "../../components/kyc/FaceVerificationPanel";
+import KYCConfirmation from "../../components/kyc/KYCConfirmation";
+import KYCVerificationPanel from "../../components/kyc/KYCVerification";
 
-import { generateKYCId } from '../../utils/mockData';
-import api from '../../services/api';
+import { generateKYCId } from "../../utils/mockData";
+import api from "../../services/api";
 
 export interface UserDetails {
   name: string;
@@ -32,7 +32,11 @@ export interface DocumentData {
   backImage: File | null;
   documentNumber: string;
   issuer: string;
-  multiDocData?: Record<string, { frontImage: File | null; backImage: File | null }>;
+  multiDocData?: Record<
+    string,
+    { frontImage: File | null; backImage: File | null }
+  >;
+  kycExpiryDate?: string;
 }
 
 export interface FaceVerificationData {
@@ -59,30 +63,30 @@ const NewKYC: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isReKYC, setIsReKYC] = useState(false);
-  const [originalKYCId, setOriginalKYCId] = useState('');
+  const [originalKYCId, setOriginalKYCId] = useState("");
   const [formData, setFormData] = useState<KYCFormData>({
     kycId: generateKYCId(),
     userDetails: {
-      name: '',
-      dateOfBirth: '',
-      gender: '',
-      address: '',
-      email: '',
-      phone: '',
-      altPhone: '',
-      state: '',
+      name: "",
+      dateOfBirth: "",
+      gender: "",
+      address: "",
+      email: "",
+      phone: "",
+      altPhone: "",
+      state: "",
     },
     documentData: {
-      type: '',
+      type: "",
       frontImage: null,
       backImage: null,
-      documentNumber: '',
-      issuer: '',
+      documentNumber: "",
+      issuer: "",
       multiDocData: {},
     },
     faceVerification: {
       selfieImage: null,
-      timestamp: '',
+      timestamp: "",
       matchScore: 0,
       riskScore: 0,
       passed: false,
@@ -98,31 +102,31 @@ const NewKYC: React.FC = () => {
     const state = location.state as any;
     if (state?.isReKYC && state?.existingData) {
       setIsReKYC(true);
-      setOriginalKYCId(state.originalKYCId || '');
-      setFormData(prev => ({
+      setOriginalKYCId(state.originalKYCId || "");
+      setFormData((prev) => ({
         ...prev,
         kycId: generateKYCId(),
         userDetails: {
-          name: state.existingData.name || '',
-          dateOfBirth: state.existingData.dateOfBirth || '',
-          gender: '',
-          address: state.existingData.address || '',
-          email: state.existingData.email || '',
-          phone: state.existingData.phone || '',
-          altPhone: '',
-          state: state.existingData.state || '',
+          name: state.existingData.name || "",
+          dateOfBirth: state.existingData.dateOfBirth || "",
+          gender: "",
+          address: state.existingData.address || "",
+          email: state.existingData.email || "",
+          phone: state.existingData.phone || "",
+          altPhone: "",
+          state: state.existingData.state || "",
         },
         documentData: {
-          type: state.existingData.documentType || '',
+          type: state.existingData.documentType || "",
           frontImage: null,
           backImage: null,
-          documentNumber: state.existingData.documentNumber || '',
-          issuer: '',
+          documentNumber: state.existingData.documentNumber || "",
+          issuer: "",
           multiDocData: {},
         },
         faceVerification: {
           selfieImage: null,
-          timestamp: '',
+          timestamp: "",
           matchScore: 0,
           riskScore: 0,
           passed: false,
@@ -136,22 +140,22 @@ const NewKYC: React.FC = () => {
 
   // Single Source of Truth Updaters
   const updateUserDetails = (details: UserDetails) => {
-    setFormData(prev => ({ ...prev, userDetails: details }));
+    setFormData((prev) => ({ ...prev, userDetails: details }));
   };
 
   const updateDocumentData = (docData: DocumentData) => {
-    setFormData(prev => ({ ...prev, documentData: docData }));
+    setFormData((prev) => ({ ...prev, documentData: docData }));
   };
 
   const updateFaceVerification = (faceData: FaceVerificationData) => {
-    setFormData(prev => ({ ...prev, faceVerification: faceData }));
+    setFormData((prev) => ({ ...prev, faceVerification: faceData }));
   };
 
   // Main KYC submission handler
   const handleSubmit = async () => {
     try {
       // Step 1: Save user details, receive real KYC ID
-      const detailsResponse = await api.post('/kyc/details', {
+      const detailsResponse = await api.post("/kyc/details", {
         fullName: formData.userDetails.name,
         dob: formData.userDetails.dateOfBirth,
         gender: formData.userDetails.gender,
@@ -160,12 +164,16 @@ const NewKYC: React.FC = () => {
         state: formData.userDetails.state,
         phone: formData.userDetails.phone,
         altPhone: formData.userDetails.altPhone,
-        aadhaarNumber: formData.documentData.documentNumber,
+        aadhaarNumber: formData.documentData.documentNumber || undefined,
       });
 
-      const { kycId: actualKycId, submittedAt, kycExpiryDate } = detailsResponse.data;
+      const {
+        kycId: actualKycId,
+        submittedAt,
+        kycExpiryDate,
+      } = detailsResponse.data;
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         kycId: actualKycId,
         submittedAt,
@@ -175,18 +183,26 @@ const NewKYC: React.FC = () => {
       // Step 2: Upload document images if available
       const docForm = new FormData();
       let docIndex = 0;
-      Object.entries(formData.documentData.multiDocData || {}).forEach(([type, files]) => {
-        if (files.frontImage) {
-          docForm.append('docs', files.frontImage, `${type}_front.jpg`);
-          docForm.append('docMeta', JSON.stringify({ index: docIndex, type }));
-          docIndex++;
+      Object.entries(formData.documentData.multiDocData || {}).forEach(
+        ([type, files]) => {
+          if (files.frontImage) {
+            docForm.append("docs", files.frontImage, `${type}_front.jpg`);
+            docForm.append(
+              "docMeta",
+              JSON.stringify({ index: docIndex, type })
+            );
+            docIndex++;
+          }
+          if (files.backImage) {
+            docForm.append("docs", files.backImage, `${type}_back.jpg`);
+            docForm.append(
+              "docMeta",
+              JSON.stringify({ index: docIndex, type })
+            );
+            docIndex++;
+          }
         }
-        if (files.backImage) {
-          docForm.append('docs', files.backImage, `${type}_back.jpg`);
-          docForm.append('docMeta', JSON.stringify({ index: docIndex, type }));
-          docIndex++;
-        }
-      });
+      );
       if (docIndex > 0) {
         await api.post(`/kyc/${actualKycId}/documents`, docForm);
       }
@@ -194,15 +210,21 @@ const NewKYC: React.FC = () => {
       // Step 3: Upload selfie if provided
       if (formData.faceVerification.selfieImage) {
         const selfieForm = new FormData();
-        selfieForm.append('selfie', formData.faceVerification.selfieImage, 'selfie.jpg');
+        selfieForm.append(
+          "selfie",
+          formData.faceVerification.selfieImage,
+          "selfie.jpg"
+        );
         await api.post(`/kyc/${actualKycId}/selfie`, selfieForm);
       }
 
       // Step 4: Save consent
-      await api.post(`/kyc/${actualKycId}/consent`, { consentGiven: formData.consent });
+      await api.post(`/kyc/${actualKycId}/consent`, {
+        consentGiven: formData.consent,
+      });
 
       // Success: Go to confirmation
-      navigate('/staff/kyc-confirmation', {
+      navigate("/staff/kyc-confirmation", {
         state: {
           kycData: {
             ...formData,
@@ -213,12 +235,15 @@ const NewKYC: React.FC = () => {
         },
       });
     } catch (error) {
-      let errorMessage = 'Failed to submit KYC. Please try again.';
+      let errorMessage = "Failed to submit KYC. Please try again.";
       if (error instanceof AxiosError && error.response) {
         if (error.response.status === 400) {
-          errorMessage = `Validation failed: ${error.response.data?.error || 'Please check your input.'}`;
+          errorMessage = `Validation failed: ${
+            error.response.data?.error || "Please check your input."
+          }`;
         } else if (error.response.status === 404) {
-          errorMessage = 'KYC ID not found. This might be a system error. Please contact support.';
+          errorMessage =
+            "KYC ID not found. This might be a system error. Please contact support.";
         } else if (error.response.data && error.response.data.error) {
           errorMessage = `Submission failed: ${error.response.data.error}`;
         } else {
@@ -243,11 +268,36 @@ const NewKYC: React.FC = () => {
 
   // Stepper data
   const steps = [
-    { number: 0, title: 'User Details', icon: User, description: 'Basic info & contact' },
-    { number: 1, title: 'Document Upload', icon: FileText, description: 'Upload and verify identity document' },
-    { number: 2, title: 'KYC Verification', icon: Shield, description: 'Verify KYC document & details' },
-    { number: 3, title: 'Biometric & Face Verification', icon: Camera, description: 'Live biometric verification' },
-    { number: 4, title: 'Review & Submit', icon: Check, description: 'Final submission of application' },
+    {
+      number: 0,
+      title: "User Details",
+      icon: User,
+      description: "Basic info & contact",
+    },
+    {
+      number: 1,
+      title: "Document Upload",
+      icon: FileText,
+      description: "Upload and verify identity document",
+    },
+    {
+      number: 2,
+      title: "KYC Verification",
+      icon: Shield,
+      description: "Verify KYC document & details",
+    },
+    {
+      number: 3,
+      title: "Biometric & Face Verification",
+      icon: Camera,
+      description: "Live biometric verification",
+    },
+    {
+      number: 4,
+      title: "Review & Submit",
+      icon: Check,
+      description: "Final submission of application",
+    },
   ];
 
   // Render current step panel — always uses live parent state
@@ -269,11 +319,16 @@ const NewKYC: React.FC = () => {
             onUpdate={updateDocumentData}
             onNext={handleNext}
             onPrevious={handlePrevious}
-            onFirstFrontImage={file => setFirstFrontImage(file)}
+            onFirstFrontImage={(file) => setFirstFrontImage(file)}
           />
         );
       case 2:
-        return <KYCVerificationPanel onPrevious={handlePrevious} onNext={handleNext} />;
+        return (
+          <KYCVerificationPanel
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+          />
+        );
       case 3:
         return (
           <FaceVerificationPanel
@@ -293,7 +348,9 @@ const NewKYC: React.FC = () => {
             formData={formData}
             onSubmit={handleSubmit}
             onPrevious={handlePrevious}
-            onConsentChange={consent => setFormData(prev => ({ ...prev, consent }))}
+            onConsentChange={(consent) =>
+              setFormData((prev) => ({ ...prev, consent }))
+            }
           />
         );
       default:
@@ -304,13 +361,15 @@ const NewKYC: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header
-        title={isReKYC ? 'Re-KYC Submission' : 'New KYC Submission'}
-        subtitle={`Processing ID: ${formData.kycId}${isReKYC ? ` (Original: ${originalKYCId})` : ''}`}
+        title={isReKYC ? "Re-KYC Submission" : "New KYC Submission"}
+        subtitle={`Processing ID: ${formData.kycId}${
+          isReKYC ? ` (Original: ${originalKYCId})` : ""
+        }`}
       />
       <main className="flex-1 p-6">
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => navigate('/staff/dashboard')}
+            onClick={() => navigate("/staff/dashboard")}
             className="flex items-center space-x-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -325,8 +384,8 @@ const NewKYC: React.FC = () => {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
                         currentStep >= step.number
-                          ? 'bg-primary border-primary text-white'
-                          : 'border-border text-muted-foreground'
+                          ? "bg-primary border-primary text-white"
+                          : "border-border text-muted-foreground"
                       }`}
                     >
                       <step.icon className="h-5 w-5" />
@@ -334,18 +393,22 @@ const NewKYC: React.FC = () => {
                     <div className="hidden md:block">
                       <p
                         className={`text-sm font-medium ${
-                          currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
+                          currentStep >= step.number
+                            ? "text-foreground"
+                            : "text-muted-foreground"
                         }`}
                       >
                         {step.title}
                       </p>
-                      <p className="text-xs text-muted-foreground">{step.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {step.description}
+                      </p>
                     </div>
                   </div>
                   {index < steps.length - 1 && (
                     <div
                       className={`w-12 md:w-20 h-0.5 mx-4 ${
-                        currentStep > step.number ? 'bg-primary' : 'bg-border'
+                        currentStep > step.number ? "bg-primary" : "bg-border"
                       }`}
                     />
                   )}

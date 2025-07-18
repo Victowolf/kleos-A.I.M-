@@ -1,23 +1,52 @@
-import React from 'react';
+import React from "react";
 
 // Import the UserDetails type from expected path
-import { UserDetails } from '../../pages/staff/NewKYC';
+import { UserDetails } from "../../pages/staff/NewKYC";
 
 interface UserDetailsPanelProps {
-  data: UserDetails;   // Consider renaming to userDetails for clarity
+  data: UserDetails; // Consider renaming to userDetails for clarity
   kycId: string;
   onUpdate: (data: UserDetails) => void;
   onNext: () => void;
 }
 
 const indianStates = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
-  "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+  "Andaman and Nicobar Islands",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry",
 ];
 
 // This component acts as a controlled form for user details entry.
@@ -26,9 +55,8 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
   data,
   kycId,
   onUpdate,
-  onNext
+  onNext,
 }) => {
-
   // When the user changes a value, notify parent to update state
   const handleInputChange = (field: keyof UserDetails, value: string) => {
     onUpdate({ ...data, [field]: value });
@@ -42,7 +70,7 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
       data.gender &&
       data.address.trim() &&
       data.email.trim() &&
-      data.phone.trim() &&          // Main phone should be required
+      data.phone.trim() && // Main phone should be required
       data.state
     );
     // Don't require altPhone (optional)
@@ -52,7 +80,9 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">User Details</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          User Details
+        </h2>
         <p className="text-muted-foreground">
           Enter the user's basic information and contact details.
         </p>
@@ -66,17 +96,19 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
       {/* Form Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         {/* Full Name */}
         <div className="md:col-span-2">
-          <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             Full Name *
           </label>
           <input
             id="name"
             type="text"
             value={data.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
+            onChange={(e) => handleInputChange("name", e.target.value)}
             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
             placeholder="Enter full name as per ID document"
             required
@@ -86,14 +118,17 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
         {/* Date of Birth */}
         <div>
-          <label htmlFor="dob" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="dob"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             Date of Birth *
           </label>
           <input
             id="dob"
             type="date"
             value={data.dateOfBirth}
-            onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+            onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
             required
             autoComplete="bday"
@@ -102,13 +137,16 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
         {/* Gender */}
         <div>
-          <label htmlFor="gender" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="gender"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             Gender *
           </label>
           <select
             id="gender"
             value={data.gender}
-            onChange={(e) => handleInputChange('gender', e.target.value)}
+            onChange={(e) => handleInputChange("gender", e.target.value)}
             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
             required
           >
@@ -121,13 +159,16 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
         {/* Address */}
         <div className="md:col-span-2">
-          <label htmlFor="address" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="address"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             Address *
           </label>
           <textarea
             id="address"
             value={data.address}
-            onChange={(e) => handleInputChange('address', e.target.value)}
+            onChange={(e) => handleInputChange("address", e.target.value)}
             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
             placeholder="Enter complete address"
             rows={3}
@@ -137,14 +178,17 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             Email Address *
           </label>
           <input
             id="email"
             type="email"
             value={data.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
+            onChange={(e) => handleInputChange("email", e.target.value)}
             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
             placeholder="user@example.com"
             required
@@ -154,20 +198,25 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
         {/* State Dropdown */}
         <div>
-          <label htmlFor="state" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="state"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             State *
           </label>
           <div className="relative z-10">
             <select
               id="state"
-              value={data.state || ''}
-              onChange={(e) => handleInputChange('state', e.target.value)}
+              value={data.state || ""}
+              onChange={(e) => handleInputChange("state", e.target.value)}
               className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
               required
             >
               <option value="">Select State</option>
               {indianStates.map((state) => (
-                <option key={state} value={state}>{state}</option>
+                <option key={state} value={state}>
+                  {state}
+                </option>
               ))}
             </select>
           </div>
@@ -175,14 +224,17 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
         {/* Phone Number (Main, required) */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             Phone Number *
           </label>
           <input
             id="phone"
             type="tel"
             value={data.phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
+            onChange={(e) => handleInputChange("phone", e.target.value)}
             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
             placeholder="+91-XXXXXXXXXX"
             required
@@ -192,14 +244,17 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
 
         {/* Alternative Phone Number (optional) */}
         <div>
-          <label htmlFor="altPhone" className="block text-sm font-medium text-foreground mb-2">
+          <label
+            htmlFor="altPhone"
+            className="block text-sm font-medium text-foreground mb-2"
+          >
             Alternative Phone Number
           </label>
           <input
             id="altPhone"
             type="tel"
             value={data.altPhone}
-            onChange={(e) => handleInputChange('altPhone', e.target.value)}
+            onChange={(e) => handleInputChange("altPhone", e.target.value)}
             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
             placeholder="+91-XXXXXXXXXX (optional)"
             autoComplete="tel"

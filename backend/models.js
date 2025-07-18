@@ -16,8 +16,12 @@ const documentSchema = new mongoose.Schema({
   contentType: {
     type: String,
     required: true
+  },
+  documentNumber: {
+    type: String,
+    required: false
   }
-});
+}, { _id: false });
 
 // Main KYC schema
 const kycSchema = new mongoose.Schema({
@@ -31,10 +35,17 @@ const kycSchema = new mongoose.Schema({
   altPhone: { type: String },
   kycId: { type: String, unique: true, required: true },
   documents: { type: [documentSchema], default: [] },
-  aadhaarNumber: { type: String },
+   aadhaarNumber: {
+    type: String,
+    validate: {
+      validator: v => /^\d{12}$/.test(v),
+      message: props => `${props.value} is not a valid Aadhaar number!`
+    },
+    required: false
+  },
   selfie: {
-    file: Buffer,
-    contentType: String
+    file: { type: Buffer },
+    contentType: { type: String }
   },
   verified: {
     otpVerified: { type: Boolean, default: false },
@@ -49,16 +60,16 @@ const kycSchema = new mongoose.Schema({
     default: Date.now
   },
   kycExpiryDate: { type: Date }
-});
+}, { timestamps: true });
 
 // Verification scan metadata schema (for logging QR scans)
 const verificationMetadataSchema = new mongoose.Schema({
-  kycId: String,             // KYC hash (ID)
-  userName: String,          // Name
-  state: String,             // State
-  expiryDate: Date,          // Expiry Date
+  kycId: { type: String },
+  userName: { type: String },
+  state: { type: String },
+  expiryDate: { type: Date },
   scannedAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 const KYC = mongoose.model("KYC", kycSchema);
 export const VerificationMetadata = mongoose.model("VerificationMetadata", verificationMetadataSchema);

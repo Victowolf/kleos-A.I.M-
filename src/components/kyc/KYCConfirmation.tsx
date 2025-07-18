@@ -1,12 +1,6 @@
-import React from 'react';
-import {
-  User,
-  FileText,
-  Camera,
-  Shield,
-  AlertTriangle
-} from 'lucide-react';
-import { KYCFormData } from '../../pages/staff/NewKYC';
+import React from "react";
+import { User, FileText, Camera, Shield, AlertTriangle } from "lucide-react";
+import { KYCFormData } from "../../pages/staff/NewKYC";
 
 interface KYCConfirmationProps {
   formData: KYCFormData;
@@ -19,7 +13,7 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
   formData,
   onSubmit,
   onPrevious,
-  onConsentChange
+  onConsentChange,
 }) => {
   const { userDetails, documentData, faceVerification } = formData;
 
@@ -49,11 +43,15 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
           </div>
           <div>
             <p className="text-muted-foreground">Date of Birth</p>
-            <p className="font-medium text-foreground">{userDetails.dateOfBirth}</p>
+            <p className="font-medium text-foreground">
+              {userDetails.dateOfBirth}
+            </p>
           </div>
           <div>
             <p className="text-muted-foreground">Gender</p>
-            <p className="font-medium capitalize text-foreground">{userDetails.gender}</p>
+            <p className="font-medium capitalize text-foreground">
+              {userDetails.gender}
+            </p>
           </div>
           <div>
             <p className="text-muted-foreground">Email</p>
@@ -69,8 +67,12 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
           </div>
           <div>
             <p className="text-muted-foreground">State</p>
-            <p className={`font-medium ${userDetails.state ? 'text-foreground' : 'text-destructive'}`}>
-              {userDetails.state || 'Not Provided'}
+            <p
+              className={`font-medium ${
+                userDetails.state ? "text-foreground" : "text-destructive"
+              }`}
+            >
+              {userDetails.state || "Not Provided"}
             </p>
           </div>
         </div>
@@ -80,19 +82,23 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="flex items-center space-x-3 mb-4">
           <FileText className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-medium text-foreground">Document Information</h3>
+          <h3 className="text-lg font-medium text-foreground">
+            Document Information
+          </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
             <p className="text-muted-foreground">Document Type</p>
             <p className="font-medium text-foreground capitalize">
-              {documentData.type.replace('_', ' ')}
+              {documentData.type.replace("_", " ")}
             </p>
           </div>
           <div>
             <p className="text-muted-foreground">Document Number</p>
-            <p className="font-medium text-foreground">{documentData.documentNumber}</p>
+            <p className="font-medium text-foreground">
+              {documentData.documentNumber}
+            </p>
           </div>
           <div>
             <p className="text-muted-foreground">Issuer</p>
@@ -100,7 +106,9 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
           </div>
           <div>
             <p className="text-muted-foreground">Expiry Date</p>
-            <p className="font-medium text-foreground">{documentData.expiryDate}</p>
+            <p className="font-medium text-foreground">
+              {documentData.kycExpiryDate}
+            </p>
           </div>
           <div>
             <p className="text-muted-foreground">Front Image</p>
@@ -119,7 +127,9 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="flex items-center space-x-3 mb-4">
           <Camera className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-medium text-foreground">Face Verification</h3>
+          <h3 className="text-lg font-medium text-foreground">
+            Face Verification
+          </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
@@ -130,21 +140,32 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
             <p className="text-sm text-muted-foreground">Face Match Score</p>
           </div>
           <div>
-            <p className={`text-2xl font-bold ${
-              faceVerification.riskScore < 30 ? 'text-success' :
-              faceVerification.riskScore < 60 ? 'text-warning' : 'text-destructive'
-            }`}>
+            <p
+              className={`text-2xl font-bold ${
+                faceVerification.riskScore < 30
+                  ? "text-success"
+                  : faceVerification.riskScore < 60
+                  ? "text-warning"
+                  : "text-destructive"
+              }`}
+            >
               {faceVerification.riskScore}
             </p>
             <p className="text-sm text-muted-foreground">Risk Score</p>
           </div>
           <div>
-            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              faceVerification.passed ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
-            }`}>
-              {faceVerification.passed ? 'PASSED' : 'FAILED'}
+            <div
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                faceVerification.passed
+                  ? "bg-success/10 text-success"
+                  : "bg-destructive/10 text-destructive"
+              }`}
+            >
+              {faceVerification.passed ? "PASSED" : "FAILED"}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Verification Status</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Verification Status
+            </p>
           </div>
         </div>
       </div>
@@ -153,21 +174,28 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
       <div className="bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-lg p-6">
         <div className="flex items-center space-x-3 mb-4">
           <Shield className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-medium text-foreground">Risk Assessment</h3>
+          <h3 className="text-lg font-medium text-foreground">
+            Risk Assessment
+          </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
             <p className="text-muted-foreground">Overall Risk Level</p>
-            <p className={`font-medium ${
-              faceVerification.riskScore < 30 ? 'text-success' :
-              faceVerification.riskScore < 60 ? 'text-warning' : 'text-destructive'
-            }`}>
+            <p
+              className={`font-medium ${
+                faceVerification.riskScore < 30
+                  ? "text-success"
+                  : faceVerification.riskScore < 60
+                  ? "text-warning"
+                  : "text-destructive"
+              }`}
+            >
               {faceVerification.riskScore < 30
-                ? 'Low Risk'
+                ? "Low Risk"
                 : faceVerification.riskScore < 60
-                ? 'Medium Risk'
-                : 'High Risk'}
+                ? "Medium Risk"
+                : "High Risk"}
             </p>
           </div>
           <div>
@@ -177,7 +205,7 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
           <div>
             <p className="text-muted-foreground">Recommendation</p>
             <p className="font-medium text-primary">
-              {faceVerification.passed ? 'Approve' : 'Review Required'}
+              {faceVerification.passed ? "Approve" : "Review Required"}
             </p>
           </div>
         </div>
@@ -189,9 +217,12 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
           <div className="flex items-center space-x-3">
             <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-destructive">Verification Failed</p>
+              <p className="text-sm font-medium text-destructive">
+                Verification Failed
+              </p>
               <p className="text-sm text-destructive/80">
-                The face verification did not meet the required threshold. Manual review is required.
+                The face verification did not meet the required threshold.
+                Manual review is required.
               </p>
             </div>
           </div>
@@ -211,8 +242,9 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
           <label htmlFor="consent" className="text-sm text-foreground">
             <p className="font-medium mb-2">Data Processing Consent</p>
             <p className="text-muted-foreground">
-              I confirm that the user has provided consent to process their data and biometrics
-              in accordance with applicable laws and secure storage guidelines.
+              I confirm that the user has provided consent to process their data
+              and biometrics in accordance with applicable laws and secure
+              storage guidelines.
             </p>
           </label>
         </div>
@@ -221,10 +253,14 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
       {/* === Validity Notice === */}
       <div className="bg-accent/5 border border-accent/20 rounded-lg p-4">
         <p className="text-sm text-foreground">
-          <strong>KYC Validity:</strong> This verification is valid for 14 months.
+          <strong>KYC Validity:</strong> This verification is valid for 14
+          months.
           <br />
           <span className="text-muted-foreground">
-            Expiry Date: {new Date(Date.now() + 14 * 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+            Expiry Date:{" "}
+            {new Date(
+              Date.now() + 14 * 30 * 24 * 60 * 60 * 1000
+            ).toLocaleDateString()}
           </span>
         </p>
       </div>

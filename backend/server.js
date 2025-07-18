@@ -1,27 +1,37 @@
-// server.js
+// server.js Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import routes from "./routes.js"; // Ensure routes.js has ES module exports
+import routes from "./routes.js"; // Ensure routes.js uses ES module syntax
 
-dotenv.config(); // Load .env variables
+dotenv.config(); // Load variables from .env
+app.use(express.json()); // <- REQUIRED to parse JSON body
+
 
 const app = express();
 
-// Middleware
+// --- Middleware ---
 app.use(cors({
-  origin: 'http://localhost:8080',  // Your frontend port
+  origin: process.env.CORS_ORIGIN || 'http://localhost:8080',  // From .env or default
   credentials: true
 }));
-app.use(express.json()); // For parsing application/json
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use("/api", routes); // Prefix routes with /api for consistency
+// --- Health check route ---
+app.get("/", (req, res) => {
+  res.send("Vault KYC backend is running.");
+});
 
-// Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI)
+// --- API Routes ---
+app.use("/api", routes);
+
+// --- MongoDB Connect ---
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(() => {
     console.log("✅ Connected to MongoDB Atlas");
 
@@ -32,4 +42,11 @@ mongoose.connect(process.env.MONGODB_URI)
   })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
   });
+
+// (Optional) Graceful shutdown - for larger apps
+// process.on('SIGINT', async () => {
+//   await mongoose.disconnect();
+//   process.exit(0);
+// });
