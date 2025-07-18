@@ -18,7 +18,7 @@ const KYCVerificationPanel: React.FC<Props> = ({ onNext, onPrevious }) => {
   const [otp, setOtp] = useState("");
   const [otpVerified, setOtpVerified] = useState(false);
 
-  const demoOTP = "123456"; // Hardcoded OTP for demo
+  const demoOTP = "616773"; // Hardcoded OTP for demo
 
   // Function to generate random 5-character alphanumeric CAPTCHA
   const generateCaptcha = () => {
@@ -40,7 +40,10 @@ const KYCVerificationPanel: React.FC<Props> = ({ onNext, onPrevious }) => {
     if (captchaInput.trim().toUpperCase() === generatedCaptcha) {
       setOtpSent(true);
       setOtpVerified(false);
-      await sendSMS("+919901669355", "Your OTP is: 123456");
+      await sendSMS(
+        "+919901669355",
+        "Dear customer, Your KYC verification code is 616773. Please enter this OTP to complete your KYC authentication. Do not share this code with anyone."
+      );
       alert("OTP sent to registered mobile number.");
     } else {
       alert("❌ Invalid CAPTCHA. Please try again.");
