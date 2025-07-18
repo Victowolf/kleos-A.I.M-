@@ -158,11 +158,8 @@ const StaffLogin: React.FC = () => {
               </button>
             </form>
 
-            {/* Demo Credentials */}
+            {/* footer */}
             <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
-              <p className="text-sm font-medium text-foreground mb-2">
-                Demo Credentials:
-              </p>
               <center>
                 <p className="text-xs text-muted-foreground">
                   © 2025 ValutKYC. All rights reserved.

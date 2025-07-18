@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Upload, Camera, FileText, CheckCircle } from 'lucide-react';
-import { DocumentData } from '../../pages/staff/NewKYC';
+import React, { useRef, useState, useEffect } from "react";
+import { Upload, Camera, FileText, CheckCircle } from "lucide-react";
+import { DocumentData } from "../../pages/staff/NewKYC";
 
 interface DocumentUploadPanelProps {
   data: DocumentData;
@@ -15,53 +15,85 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
   onUpdate,
   onFirstFrontImage,
   onNext,
-  onPrevious
+  onPrevious,
 }) => {
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
-  const [multiDocData, setMultiDocData] = useState<Record<string, { frontImage: File | null; backImage: File | null }>>({});
-  const [firstFrontCaptured, setFirstFrontCaptured] = useState<boolean>(false); // NEW STATE
+  const [multiDocData, setMultiDocData] = useState<
+    Record<string, { frontImage: File | null; backImage: File | null }>
+  >({});
+  const [firstFrontCaptured, setFirstFrontCaptured] = useState<boolean>(false);
+  const [manipulationResult, setManipulationResult] = useState<
+    null | "verified" | "tampered"
+  >(null); // NEW STATE
 
   const documentTypes = [
-    { value: 'aadhaar', label: 'Aadhaar Card', requiresBack: true },
-    { value: 'pan', label: 'PAN Card', requiresBack: false },
-    { value: 'passport', label: 'Passport', requiresBack: false },
-    { value: 'driving_license', label: 'Driving License', requiresBack: true },
-    { value: 'voter_id', label: 'Voter ID', requiresBack: true }
+    { value: "aadhaar", label: "Aadhaar Card", requiresBack: true },
+    { value: "pan", label: "PAN Card", requiresBack: false },
+    { value: "passport", label: "Passport", requiresBack: false },
+    { value: "driving_license", label: "Driving License", requiresBack: true },
+    { value: "voter_id", label: "Voter ID", requiresBack: true },
   ];
 
   const toggleDocumentType = (type: string) => {
     const newSelection = selectedDocs.includes(type)
-      ? selectedDocs.filter(t => t !== type)
+      ? selectedDocs.filter((t) => t !== type)
       : [...selectedDocs, type];
     setSelectedDocs(newSelection);
   };
 
-  const handleMultiUpload = (type: string, side: 'front' | 'back', file: File) => {
+  const handleMultiUpload = (
+    type: string,
+    side: "front" | "back",
+    file: File
+  ) => {
     const updated = {
       ...multiDocData,
       [type]: {
         ...(multiDocData[type] || { frontImage: null, backImage: null }),
-        [side + 'Image']: file
-      }
+        [side + "Image"]: file,
+      },
     };
 
     setMultiDocData(updated);
 
+    const verifyImageManipulation = async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("http://localhost:8000/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.manipulated) {
+          setManipulationResult("tampered");
+        } else {
+          setManipulationResult("verified");
+        }
+      } catch (error) {
+        console.error("Manipulation check failed:", error);
+        setManipulationResult("tampered"); // fallback: assume tampered
+      }
+    };
+
     // Store the first front image only
-    if (!firstFrontCaptured && side === 'front') {
+    if (!firstFrontCaptured && side === "front") {
       onFirstFrontImage(file);
       setFirstFrontCaptured(true);
+      verifyImageManipulation(file);
     }
 
     // Update main KYC form state with the most recent document (optional)
-    if (side === 'front') {
+    if (side === "front") {
       onUpdate({
         ...data,
         frontImage: file,
         type,
-        documentNumber: '',
-        issuer: '',
-        
+        documentNumber: "",
+        issuer: "",
       });
     }
   };
@@ -84,9 +116,9 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
           </div>
           <button
             onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'image/*,.pdf';
+              const input = document.createElement("input");
+              input.type = "file";
+              input.accept = "image/*,.pdf";
               input.onchange = (e) => {
                 const target = e.target as HTMLInputElement;
                 if (target.files?.[0]) {
@@ -105,7 +137,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
           <Upload className="h-12 w-12 text-muted-foreground mx-auto" />
           <div>
             <p className="font-medium text-foreground">
-              {title} {required && '*'}
+              {title} {required && "*"}
             </p>
             <p className="text-sm text-muted-foreground">
               Click to upload or drag and drop
@@ -113,9 +145,9 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
           </div>
           <button
             onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'image/*,.pdf';
+              const input = document.createElement("input");
+              input.type = "file";
+              input.accept = "image/*,.pdf";
               input.onchange = (e) => {
                 const target = e.target as HTMLInputElement;
                 if (target.files?.[0]) {
@@ -137,7 +169,9 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Document Upload</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          Document Upload
+        </h2>
         <p className="text-muted-foreground">
           Select document types and upload clear images or PDFs.
         </p>
@@ -155,14 +189,14 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
               onClick={() => toggleDocumentType(docType.value)}
               className={`p-4 border rounded-lg text-left transition-colors ${
                 selectedDocs.includes(docType.value)
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:bg-muted/50'
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:bg-muted/50"
               }`}
             >
               <FileText className="h-5 w-5 mb-2 text-primary" />
               <p className="font-medium text-foreground">{docType.label}</p>
               <p className="text-xs text-muted-foreground">
-                {docType.requiresBack ? 'Front & Back required' : 'Front only'}
+                {docType.requiresBack ? "Front & Back required" : "Front only"}
               </p>
             </button>
           ))}
@@ -172,24 +206,49 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
       {/* Upload Area Per Document */}
       {selectedDocs.length > 0 && (
         <div className="space-y-10">
-          {selectedDocs.map(type => {
-            const docMeta = documentTypes.find(d => d.value === type);
-            const docFiles = multiDocData[type] || { frontImage: null, backImage: null };
+          {selectedDocs.map((type) => {
+            const docMeta = documentTypes.find((d) => d.value === type);
+            const docFiles = multiDocData[type] || {
+              frontImage: null,
+              backImage: null,
+            };
             return (
               <div key={type} className="border border-border rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-foreground mb-4">{docMeta?.label}</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  {docMeta?.label}
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FileUploadArea
                     title="Upload Front Side"
                     file={docFiles.frontImage}
-                    onUpload={(file) => handleMultiUpload(type, 'front', file)}
+                    onUpload={(file) => handleMultiUpload(type, "front", file)}
                     required
                   />
+                  {/* ✅ Show manipulation status for the first front image */}
+                  {!firstFrontCaptured || type !== selectedDocs[0] ? null : (
+                    <div className="mt-2 text-sm">
+                      {manipulationResult === null && (
+                        <span className="text-yellow-600 font-medium">
+                          🔍 Checking for manipulation...
+                        </span>
+                      )}
+                      {manipulationResult === "verified" && (
+                        <span className="text-green-600 font-medium">
+                          ✅ Image Verified
+                        </span>
+                      )}
+                      {manipulationResult === "tampered" && (
+                        <span className="text-red-600 font-medium">
+                          ❌ Possible Manipulation Detected
+                        </span>
+                      )}
+                    </div>
+                  )}
                   {docMeta?.requiresBack && (
                     <FileUploadArea
                       title="Upload Back Side"
                       file={docFiles.backImage}
-                      onUpload={(file) => handleMultiUpload(type, 'back', file)}
+                      onUpload={(file) => handleMultiUpload(type, "back", file)}
                       required
                     />
                   )}
@@ -202,16 +261,15 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
 
       {/* Navigation */}
       <div className="flex justify-between mt-8">
-        <button
-          onClick={onPrevious}
-          className="btn-secondary"
-        >
+        <button onClick={onPrevious} className="btn-secondary">
           Previous: User Details
         </button>
-        
+
         <button
           onClick={onNext}
-          disabled={selectedDocs.length === 0}
+          disabled={
+            selectedDocs.length === 0 || manipulationResult !== "verified"
+          }
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next

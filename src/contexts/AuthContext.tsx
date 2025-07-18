@@ -58,6 +58,7 @@ const initialState: ExtendedAuthState = {
   role: null,
   loading: false,
   error: null,
+  walletAddress: null,
 };
 
 // 🔄 Auth Reducer
@@ -81,6 +82,7 @@ const authReducer = (
         user: action.payload,
         role: action.payload.role,
         error: null,
+        walletAddress: action.payload.walletAddress,
       };
 
     case "LOGIN_ERROR":
@@ -137,9 +139,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: state.isAuthenticated,
         user: state.user,
         role: state.role,
+        walletAddress: state.walletAddress,
       });
     }
-  }, [state.isAuthenticated, state.user, state.role]);
+  }, [state.isAuthenticated, state.user, state.role, state.walletAddress]);
 
   // 🔐 Login function
   const login = async (
@@ -150,9 +153,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: "LOGIN_START" });
 
     try {
-      const user = await authenticateUser(username, password, role);
+      const result = await authenticateUser(username, password, role);
 
-      if (user) {
+      if (result) {
+        const { user } = result; // ✅ destructure user from result
         dispatch({ type: "LOGIN_SUCCESS", payload: user });
         return true;
       } else {

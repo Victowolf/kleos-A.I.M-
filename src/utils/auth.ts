@@ -13,12 +13,14 @@ export interface User {
   role: 'admin' | 'staff';
   fullName: string;
   email: string;
+  walletAddress: string;
 }
 
 export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
   role: 'admin' | 'staff' | null;
+  walletAddress: string | null;
 }
 
 // 🔐 Hardcoded user credentials
@@ -28,14 +30,16 @@ export const USERS: Record<'admin' | 'staff', User> = {
     password: "admin123",
     role: "admin",
     fullName: "Admin User",
-    email: "admin@vaultkyc.com"
+    email: "admin@vaultkyc.com",
+    walletAddress: "0xBa225F7569e4ec27ddbcCbE9Ac418d26868877Ca"
   },
   staff: {
     username: "staff",
     password: "staff123",
     role: "staff",
     fullName: "Staff Member",
-    email: "staff@vaultkyc.com"
+    email: "staff@vaultkyc.com",
+    walletAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
   }
 };
 
@@ -46,7 +50,7 @@ export const authenticateUser = async (
   username: string,
   password: string,
   role: 'admin' | 'staff'
-): Promise<User | null> => {
+): Promise<{ user: User; wallet: string } | null> => {
   // Step 1: Validate credentials
   const user = USERS[role];
   if (!(user.username === username && user.password === password)) {
@@ -71,7 +75,11 @@ export const authenticateUser = async (
       return null;
     }
 
-    return user;
+    return {
+  user: { ...user, walletAddress: connectedWallet },
+  wallet: connectedWallet
+};
+
   } catch (error) {
     console.error("MetaMask authentication failed:", error);
     return null;
