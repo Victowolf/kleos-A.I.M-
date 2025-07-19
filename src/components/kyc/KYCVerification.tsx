@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 export async function sendSMS(to: string, body: string) {
-  return axios.post("/api/send-sms", { to, body });
+  // return axios.post("/api/send-sms", { to, body });
 }
 
 interface Props {

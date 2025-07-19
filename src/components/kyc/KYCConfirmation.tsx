@@ -9,6 +9,20 @@ interface KYCConfirmationProps {
   onConsentChange: (consent: boolean) => void;
 }
 
+const kycIdName = "kamran";
+const kycHash =
+  "0x111e7a3b40a1de982b6445703b271e2bea222ab3a8567ba2f3b439b509ea3c87";
+const timestamp = Date.now();
+
+export async function callKycToChain(kycIdName, kycHash, timestamp) {
+  const response = await fetch("http://localhost:7000/kyctochain", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kycIdName, kycHash, timestamp }),
+  });
+  return response.json();
+}
+
 const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
   formData,
   onSubmit,
@@ -271,10 +285,14 @@ const KYCConfirmation: React.FC<KYCConfirmationProps> = ({
           ← Previous Step
         </button>
         <button
-          onClick={onSubmit}
+          onClick={() => (
+            onSubmit(), callKycToChain(kycIdName, kycHash, timestamp)
+          )}
           disabled={!formData.consent}
-          className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-primary disabled:opacity-50
+          disabled:cursor-not-allowed"
         >
+          {" "}
           Submit KYC Application
         </button>
       </div>
