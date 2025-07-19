@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from "react";
+import BlockchainVisualizer from "./BlockchainVisualizer";
 import {
   TrendingUp,
   Users,
@@ -174,11 +175,9 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
                 <div className="p-6 flex justify-center items-center h-96">
-                  <img
-                    src="https://via.placeholder.com/800x300.png?text=Blockchain+Visualizer+Preview"
-                    alt="Blockchain Visualizer"
-                    className="rounded-lg shadow-md max-w-full h-auto"
-                  />
+                  <div className="w-full h-96">
+                    <BlockchainVisualizer />
+                  </div>
                 </div>
               </div>
             </div>
@@ -190,7 +189,7 @@ const AdminDashboard: React.FC = () => {
                 <div className="p-6 border-b border-border">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-foreground">
-                      KYC Submissions
+                      Blockchain Transactions
                     </h3>
                   </div>
                 </div>
@@ -253,7 +252,7 @@ const AdminDashboard: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     <Box className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold text-foreground">
-                      Blockchain Transactions
+                      Audit Logs
                     </h3>
                   </div>
                 </div>
