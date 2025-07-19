@@ -40,10 +40,7 @@ const KYCVerificationPanel: React.FC<Props> = ({ onNext, onPrevious }) => {
     if (captchaInput.trim().toUpperCase() === generatedCaptcha) {
       setOtpSent(true);
       setOtpVerified(false);
-      await sendSMS(
-        "+919901669355",
-        "Dear customer, Your KYC verification code is 616773. Please enter this OTP to complete your KYC authentication. Do not share this code with anyone."
-      );
+      await sendSMS("+919901669355", "your otp is 616377");
       alert("OTP sent to registered mobile number.");
     } else {
       alert("❌ Invalid CAPTCHA. Please try again.");
