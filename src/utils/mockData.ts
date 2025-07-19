@@ -203,35 +203,69 @@ export const mockComments: KYCComment[] = [
 ];
 
 // 🔗 Mock Blockchain Transactions
-export const mockBlockchainTxs: BlockchainTransaction[] = [
+// AUDIT LOG ENTRY TYPE
+export interface KycAuditLogEntry {
+  id: string; // Unique log entry
+  kycId: string; // KYC process ID
+  event: string; // e.g., 'KYC_SUBMITTED', 'DOC_VALIDATED', etc.
+  timestamp: string;
+  performedBy: string; // User, staff, or system
+  blockchainHash?: string; // On-chain hash (if event is anchored)
+  blockNumber?: number; // Block number for immutability
+  meta?: Record<string, any>; // Any extra info (e.g., confidence scores, passed checks)
+}
+
+// MOCK AUDIT LOG ENTRIES
+export const mockKycAuditLog: KycAuditLogEntry[] = [
   {
-    id: 'TX001',
-    hash: '0x1234567890abcdef1234567890abcdef12345678',
+    id: 'LOG001',
     kycId: 'KYC-STF-000001',
-    timestamp: '2024-01-15T11:05:00Z',
-    blockNumber: 1234567,
-    gasUsed: '21000',
-    status: 'confirmed'
+    event: 'KYC_SUBMITTED',
+    timestamp: '2025-07-18T09:00:00Z',
+    performedBy: 'user_0xbadbeef',
+    blockchainHash: '0xabc000...001',
+    blockNumber: 2345678,
+    meta: { sourceIP: '203.0.113.5' }
   },
   {
-    id: 'TX002',
-    hash: '0xabcdef1234567890abcdef1234567890abcdef12',
-    kycId: 'KYC-STF-000004',
-    timestamp: '2024-01-18T17:00:00Z',
-    blockNumber: 1234589,
-    gasUsed: '21000',
-    status: 'confirmed'
+    id: 'LOG002',
+    kycId: 'KYC-STF-000001',
+    event: 'DOC_VALIDATED',
+    timestamp: '2025-07-18T09:01:00Z',
+    performedBy: 'system_autoOCR',
+    blockchainHash: '0xabc000...002',
+    blockNumber: 2345679,
+    meta: { docType: 'PAN', isFake: false }
+  },
+  {
+    id: 'LOG003',
+    kycId: 'KYC-STF-000001',
+    event: 'BIOMETRIC_MATCHED',
+    timestamp: '2025-07-18T09:02:00Z',
+    performedBy: 'system_faceIris',
+    blockchainHash: '0xabc000...003',
+    blockNumber: 2345680,
+    meta: { confidence: 0.97 }
+  },
+  {
+    id: 'LOG004',
+    kycId: 'KYC-STF-000001',
+    event: 'KYC_APPROVED',
+    timestamp: '2025-07-18T09:03:00Z',
+    performedBy: 'staff_adminX',
+    blockchainHash: '0xabc000...004',
+    blockNumber: 2345681
   }
 ];
 
-// 🆔 KYC ID Generator
+// KYC ID GENERATOR (unchanged)
 export const generateKYCId = (): string => {
   const timestamp = Date.now();
   const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
   return `KYC-STF-${timestamp.toString().slice(-6)}${random}`;
 };
 
-// 📅 Date Helper Functions
+// DATE HELPERS (unchanged)
 export const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString('en-IN', {
     year: 'numeric',
@@ -249,6 +283,7 @@ export const formatDateTime = (dateString: string): string => {
     minute: '2-digit'
   });
 };
+
 
 // 📈 Risk Score Calculator (dummy implementation)
 export const calculateRiskScore = (faceMatchScore: number, documentQuality: number): number => {

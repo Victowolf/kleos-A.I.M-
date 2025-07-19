@@ -28,7 +28,7 @@ import {
   mockAnalytics,
   mockKYCSubmissions,
   mockComments,
-  mockBlockchainTxs,
+  mockKycAuditLog,
   formatDate,
   formatDateTime,
   getStatusBadge,
@@ -257,32 +257,50 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
                 <div className="p-4 space-y-4">
-                  {mockBlockchainTxs.map((tx) => (
-                    <div key={tx.id} className="space-y-2">
+                  {mockKycAuditLog.map((log) => (
+                    <div key={log.id} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-foreground">
-                          Block #{tx.blockNumber}
+                          Block #{log.blockNumber ?? "—"}
                         </span>
                         <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            tx.status === "confirmed"
-                              ? "bg-success/10 text-success"
-                              : "bg-warning/10 text-warning"
-                          }`}
+                          className={`text-xs px-2 py-1 rounded-full bg-accent/10 text-accent`}
                         >
-                          {tx.status}
+                          {log.event.replace(/_/g, " ")}
                         </span>
                       </div>
-                      <p className="text-xs font-mono text-muted-foreground break-all">
-                        {tx.hash}
-                      </p>
+                      {log.blockchainHash && (
+                        <p className="text-xs font-mono text-muted-foreground break-all">
+                          {log.blockchainHash}
+                        </p>
+                      )}
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-primary">{tx.kycId}</span>
-                        <button className="text-xs text-primary hover:underline flex items-center space-x-1">
-                          <ExternalLink className="h-3 w-3" />
-                          <span>View</span>
-                        </button>
+                        <span className="text-xs text-primary">
+                          {log.kycId}
+                        </span>
+                        <span className="text-xs text-foreground">
+                          {log.performedBy}
+                        </span>
+                        {log.blockchainHash && (
+                          <a
+                            href={`https://etherscan.io/tx/${log.blockchainHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline flex items-center space-x-1"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            <span>View</span>
+                          </a>
+                        )}
                       </div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDateTime(log.timestamp)}
+                      </div>
+                      {log.meta && (
+                        <pre className="bg-muted text-xs p-2 rounded">
+                          {JSON.stringify(log.meta, null, 2)}
+                        </pre>
+                      )}
                     </div>
                   ))}
                 </div>
